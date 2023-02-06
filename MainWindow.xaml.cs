@@ -29,8 +29,6 @@ namespace SimonDock
         public MainWindow()
         {
             InitializeComponent();
-            dock = new Dock();
-            LoadState();
 
             IsEnabled = true;
 
@@ -44,8 +42,11 @@ namespace SimonDock
             // allow file drop
             AllowDrop = true;
 
+            dock = new Dock();
+            LoadState();
             if (dock.isEmpty())
             {
+                // default icons
                 dock.AddIcon(new Icon("1.txt"));
                 dock.AddIcon(new Icon("2.txt"));
                 dock.AddIcon(new Icon("3.txt"));
@@ -93,6 +94,11 @@ namespace SimonDock
         private void Window_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             System.Diagnostics.Debug.WriteLine("mouse down");
+        }
+
+        private void Window_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("mouse up");
             dock.on_click(WinCanvas);
         }
 

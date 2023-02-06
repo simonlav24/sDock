@@ -43,7 +43,7 @@ namespace SimonDock
             {
                 var x = currentX + icon.Radius;
                 currentX = x + icon.Radius;
-                var y = canvas.ActualHeight / 2;
+                var y = canvas.ActualHeight / 2 - icon.Radius;
                 icon.X = x;
                 icon.Y = y;
             }

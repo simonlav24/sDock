@@ -1,22 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using TsudaKageyu;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace SimonDock
 {    
     public class Icon
     {
-        public const double DefaultRadius = 50;
-        public const double DefaultLargeRadius = 70;
+        public const double DefaultRadius = 50.0;
+        public const double DefaultLargeRadius = 70.0;
+        public const double CloseDistance = 0.5;
+        public const double EnteringDistance = 2.0;
 
         public double X { get; set; }
         public double Y { get; set; }
@@ -27,21 +37,31 @@ namespace SimonDock
         
         public String AbsolutePath { get; set; }
 
-        public System.Windows.Controls.Image? image;
+        public System.Windows.Controls.Image? IconImage;
 
         public Icon(string path="icon.txt")
         {
             Radius = DefaultRadius;
+            // handle path
+            if(path.EndsWith(".lnk"))
+            {
+                // resolve shortcut
+                Shell32.Shell shell = new Shell32.Shell();
+                Shell32.Folder folder = shell.NameSpace(System.IO.Path.GetDirectoryName(path));
+                Shell32.FolderItem folderItem = folder.ParseName(System.IO.Path.GetFileName(path));
+                if (folderItem != null)
+                {
+                    Shell32.ShellLinkObject link = (Shell32.ShellLinkObject)folderItem.GetLink;
+                    AbsolutePath = link.Path;
+                }
+            }
             AbsolutePath = path;
             Name = System.IO.Path.GetFileName(path);
+            GetIconImage(AbsolutePath);
         }
 
         public Icon()
         {
-            X = 0;
-            Y = 0;
-            Radius = DefaultRadius;
-            Name = "parameterless";
         }
 
         public void Draw(Canvas canvas)
@@ -50,59 +70,41 @@ namespace SimonDock
             var mousePos = Mouse.GetPosition(canvas);
             //System.Diagnostics.Debug.WriteLine(mousePos);
 
-            
-
             var distance = Math.Sqrt(Math.Pow(mousePos.X - X, 2) + Math.Pow(mousePos.Y - Y, 2));
 
-            if(distance < DefaultRadius * 2)
+            Radius = zoomLogisticFunction(distance);
+            //Radius = zoomLinearFunction(distance);
+
+            // draw the image
+            if (IconImage is not null)
             {
-                Radius = -0.2 * distance + DefaultLargeRadius;
+                canvas.Children.Add(IconImage);
+                // scale the image to radius
+                var scale = 2 * Radius / IconImage.ActualWidth;
+                ScaleTransform scaleTransform = new ScaleTransform(scale, scale);
+                IconImage.RenderTransform = scaleTransform;
+                Canvas.SetLeft(IconImage, X - Radius);
+                Canvas.SetTop(IconImage, Y - Radius);
             }
             else
             {
-                Radius = DefaultRadius;
+                // draw circle
+                Ellipse ellipse = new Ellipse
+                {
+                    Fill = System.Windows.Media.Brushes.Red,
+                    Width = 2 * Radius,
+                    Height = 2 * Radius
+                };
+                canvas.Children.Add(ellipse);
+                Canvas.SetLeft(ellipse, X - Radius);
+                Canvas.SetTop(ellipse, Y - Radius);
             }
-
-            // draw circle
-            Ellipse ellipse = new Ellipse
-            {
-                Fill = System.Windows.Media.Brushes.Red,
-                Width = 2 * Radius,
-                Height = 2 * Radius
-            };
-            canvas.Children.Add(ellipse);
-            Canvas.SetLeft(ellipse, X - Radius);
-            Canvas.SetTop(ellipse, Y - Radius);
-
-            // draw image
-            //Image image = new Image
-            //{ 
-            //    Source = new System.Windows.Media.Imaging.BitmapImage(new Uri("D:\\Projects\\SimonDock\\SimonDock\\assets\\github.png")),
-            //    Width = 2 * Radius,
-            //    Height = 2 * Radius
-            //};
-            //canvas.Children.Add(image);
-            //Canvas.SetLeft(image, X - Radius);
-            //Canvas.SetTop(image, Y - Radius);
-
-            // draw the image
-            if (image is not null)
-            {
-                canvas.Children.Add(image);
-                // scale the image to radius
-                ScaleTransform scale = new ScaleTransform(4, 4);
-                image.RenderTransform = scale;
-                Canvas.SetLeft(image, X - Radius);
-                Canvas.SetTop(image, Y - Radius);
-
-            }
-
 
             // draw Text
             TextBlock textBlock = new TextBlock
             {
                 Text = Name,
-                FontSize = 20,
+                FontSize = 16,
                 Foreground = System.Windows.Media.Brushes.White
             };
             
@@ -111,8 +113,76 @@ namespace SimonDock
             textBlock.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
             System.Windows.Size textBlockSize = textBlock.DesiredSize;
             Canvas.SetLeft(textBlock, X - textBlockSize.Width / 2);
-            Canvas.SetTop(textBlock, Y - textBlockSize.Height / 2);
+            Canvas.SetTop(textBlock, Y + Radius);
 
+        }
+
+        // icon image
+        private void GetIconImage(string path)
+        {
+            if (File.Exists(path))
+            {
+                // is file
+                IconExtractor ie = new IconExtractor(path);
+                string fileName = ie.FileName;
+                int iconCount = ie.Count;
+
+                //System.Drawing.Icon icon0 = ie.GetIcon(0);
+                //System.Drawing.Icon icon1 = ie.GetIcon(1);
+
+                System.Drawing.Icon[] allIcons = ie.GetAllIcons();
+                // get the first biggest
+                System.Drawing.Icon biggest = allIcons[0];
+                foreach(var i in allIcons)
+                {
+                    if (i.Size.Width > biggest.Size.Width)
+                        biggest = i;
+                }
+                IconImage = new System.Windows.Controls.Image();
+                IconImage.Source = Imaging.CreateBitmapSourceFromHIcon(
+                    biggest.Handle,
+                    System.Windows.Int32Rect.Empty,
+                    BitmapSizeOptions.FromEmptyOptions());
+
+            }
+            else if (Directory.Exists(path))
+            {
+                // is Folder 
+            }
+            else
+            {
+                // invalid path
+            }
+            
+        }
+
+        // zoom functions
+        private double zoomLogisticFunction(double distance)
+        {
+            var num = - (DefaultLargeRadius - DefaultRadius);
+            var exp = -0.1 * (distance - (DefaultRadius * CloseDistance + DefaultRadius * EnteringDistance) / 2.0);
+            var denom = 1 + Math.Exp(exp);
+
+            return num / denom + DefaultLargeRadius;
+        }
+
+        private double zoomLinearFunction(double distance)
+        {
+            if(distance < DefaultRadius * 2)
+            {
+                if (distance < DefaultRadius * 0.5)
+                {
+                    return DefaultLargeRadius;
+                }
+                else
+                {
+                    return -((DefaultLargeRadius - DefaultRadius) /(DefaultRadius * 2 - DefaultRadius * 0.5)) * (distance - DefaultRadius * 2) + DefaultRadius;
+                }
+            }
+            else
+            {
+                return DefaultRadius;
+            }
         }
 
     }

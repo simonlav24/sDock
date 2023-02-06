@@ -10,7 +10,8 @@
         AllowsTransparency="True"
         Background="Transparent"
         IsHitTestVisible="True"
-        PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown">
+        PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown"
+        PreviewMouseLeftButtonUp="Window_PreviewMouseLeftButtonUp">
     <Canvas Name="WinCanvas" Background="#01000000">
         
     </Canvas>
