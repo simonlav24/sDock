@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using System.IO;
 
 namespace SimonDock
 {
@@ -28,6 +30,14 @@ namespace SimonDock
         public bool isEmpty()
         {
             return icons.Count == 0;
+        }
+
+        public void Step(Canvas canvas)
+        {
+            foreach (var icon in icons)
+            {
+                icon.Step(canvas);
+            }
         }
 
         // draw method        
@@ -55,31 +65,72 @@ namespace SimonDock
             }
         }
         
-        public void on_click(Canvas canvas)
+        private Icon? findIcon(Canvas canvas)
         {
-            // get the mouse position in the main window
             var mousePos = Mouse.GetPosition(canvas);
-            //System.Diagnostics.Debug.WriteLine(mousePos);
-
-            // find the icon 
             foreach (var icon in icons)
             {
                 var distance = Math.Sqrt(Math.Pow(mousePos.X - icon.X, 2) + Math.Pow(mousePos.Y - icon.Y, 2));
                 if (distance < icon.Radius)
                 {
                     System.Diagnostics.Debug.WriteLine("clicked on " + icon.Name);
-                    // open the file or folder
-                    if (icon.AbsolutePath != null)
-                    {
-                        if (System.IO.File.Exists(icon.AbsolutePath))
-                        {
-                            System.Diagnostics.Process.Start(icon.AbsolutePath);
-                        }
-                        else if (System.IO.Directory.Exists(icon.AbsolutePath))
-                        {
-                            Process.Start("explorer.exe", icon.AbsolutePath);
-                        }
-                    }
+                    return icon;
+                }
+            }
+            return null;
+        }
+
+        public void on_rightclick(Canvas canvas)
+        {
+            var icon = findIcon(canvas);
+            if (icon == null)
+                return;
+            // create a new context menu
+            var contextMenu = new ContextMenu();
+            
+            // rename option
+            var rename = new MenuItem();
+            rename.Header = "Edit";
+            contextMenu.Items.Add(rename);
+
+            // remove option
+            var remove = new MenuItem();
+            remove.Header = "Remove";
+            remove.Click += (sender, args) => RemoveIcon(icon);
+            contextMenu.Items.Add(remove);
+
+            if (File.Exists(icon.AbsolutePath))
+            {
+                var openLocation = new MenuItem();
+                openLocation.Header = "Open file location";
+                openLocation.Click += (sender, args) => OpenFileLocation(icon);
+                contextMenu.Items.Add(openLocation);
+            }
+
+            // show the context menu
+            contextMenu.IsOpen = true;
+            
+        }
+
+        private void OpenLocation_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void on_click(Canvas canvas)
+        {
+            var icon = findIcon(canvas);
+            if (icon == null)
+                return;
+            if (icon.AbsolutePath != null)
+            {
+                if (System.IO.File.Exists(icon.AbsolutePath))
+                {
+                    System.Diagnostics.Process.Start(icon.AbsolutePath);
+                }
+                else if (System.IO.Directory.Exists(icon.AbsolutePath))
+                {
+                    Process.Start("explorer.exe", icon.AbsolutePath);
                 }
             }
         }
@@ -93,5 +144,16 @@ namespace SimonDock
             }
             return list;
         }
+
+        private void RemoveIcon(Icon iconToRemove)
+        {
+            icons.Remove(iconToRemove);
+        }
+
+        private void OpenFileLocation(Icon icon)
+        {
+            Process.Start("explorer.exe", System.IO.Path.GetDirectoryName(icon.AbsolutePath));
+        }
+
     }
 }

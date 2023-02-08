@@ -11,6 +11,7 @@
         Background="Transparent"
         IsHitTestVisible="True"
         PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown"
+        PreviewMouseRightButtonUp="Window_PreviewMouseRightButtonUp"
         PreviewMouseLeftButtonUp="Window_PreviewMouseLeftButtonUp"
         ShowInTaskbar="False">
     <Canvas Name="WinCanvas" Background="#01000000">

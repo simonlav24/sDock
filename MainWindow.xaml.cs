@@ -134,19 +134,29 @@ namespace SimonDock
                 this.WindowState = WindowState.Normal;
             }
 
+            // step
+            dock.Step(WinCanvas);
+
+            // draw
             WinCanvas.Children.Clear();
             dock.Draw(WinCanvas);
         }
 
         private void Window_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("mouse down");
+            //System.Diagnostics.Debug.WriteLine("mouse down");
         }
 
         private void Window_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             System.Diagnostics.Debug.WriteLine("mouse up");
             dock.on_click(WinCanvas);
+        }
+
+        private void Window_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine("mouse right up");
+            dock.on_rightclick(WinCanvas);
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
