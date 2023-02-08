@@ -18,12 +18,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using TsudaKageyu;
 using static System.Net.Mime.MediaTypeNames;
+using Application = System.Windows.Application;
+using Image = System.Windows.Controls.Image;
 
 namespace SimonDock
 {    
     public class Icon
     {
-        public const double DefaultRadius = 50.0;
+        public const double DefaultRadius = 40.0;
         public const double DefaultLargeRadius = 70.0;
         public const double CloseDistance = 0.5;
         public const double EnteringDistance = 2.0;
@@ -35,28 +37,23 @@ namespace SimonDock
         
         public String Name { get; set; }
         
+        public TextBlock NameBlock { get; set; }
+        
         public String AbsolutePath { get; set; }
 
-        public System.Windows.Controls.Image? IconImage;
+        public Image IconImage { get; set; }
 
         public Icon(string path="icon.txt")
         {
             Radius = DefaultRadius;
-            // handle path
-            if(path.EndsWith(".lnk"))
-            {
-                // resolve shortcut
-                Shell32.Shell shell = new Shell32.Shell();
-                Shell32.Folder folder = shell.NameSpace(System.IO.Path.GetDirectoryName(path));
-                Shell32.FolderItem folderItem = folder.ParseName(System.IO.Path.GetFileName(path));
-                if (folderItem != null)
-                {
-                    Shell32.ShellLinkObject link = (Shell32.ShellLinkObject)folderItem.GetLink;
-                    AbsolutePath = link.Path;
-                }
-            }
             AbsolutePath = path;
             Name = System.IO.Path.GetFileName(path);
+            NameBlock = new TextBlock
+            {
+                Text = Name,
+                FontSize = 16,
+                Foreground = System.Windows.Media.Brushes.White
+            };
             GetIconImage(AbsolutePath);
         }
 
@@ -88,32 +85,25 @@ namespace SimonDock
             }
             else
             {
-                // draw circle
+                /*// draw circle
                 Ellipse ellipse = new Ellipse
                 {
                     Fill = System.Windows.Media.Brushes.Red,
                     Width = 2 * Radius,
                     Height = 2 * Radius
                 };
-                canvas.Children.Add(ellipse);
+                if (!canvas.Children.Contains(ellipse))
+                    canvas.Children.Add(ellipse);
                 Canvas.SetLeft(ellipse, X - Radius);
-                Canvas.SetTop(ellipse, Y - Radius);
+                Canvas.SetTop(ellipse, Y - Radius);*/
             }
 
             // draw Text
-            TextBlock textBlock = new TextBlock
-            {
-                Text = Name,
-                FontSize = 16,
-                Foreground = System.Windows.Media.Brushes.White
-            };
-            
-            canvas.Children.Add(textBlock);
-            // draw the text in the center of the circle
-            textBlock.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
-            System.Windows.Size textBlockSize = textBlock.DesiredSize;
-            Canvas.SetLeft(textBlock, X - textBlockSize.Width / 2);
-            Canvas.SetTop(textBlock, Y + Radius);
+            canvas.Children.Add(NameBlock);
+            NameBlock.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
+            System.Windows.Size textBlockSize = NameBlock.DesiredSize;
+            Canvas.SetLeft(NameBlock, X - textBlockSize.Width / 2);
+            Canvas.SetTop(NameBlock, canvas.ActualHeight - 25);
 
         }
 
@@ -138,7 +128,7 @@ namespace SimonDock
                     if (i.Size.Width > biggest.Size.Width)
                         biggest = i;
                 }
-                IconImage = new System.Windows.Controls.Image();
+                IconImage = new Image();
                 IconImage.Source = Imaging.CreateBitmapSourceFromHIcon(
                     biggest.Handle,
                     System.Windows.Int32Rect.Empty,
@@ -147,7 +137,14 @@ namespace SimonDock
             }
             else if (Directory.Exists(path))
             {
-                // is Folder 
+                // icon image to copy from default icon
+                IconImage = new Image();
+                IconImage = new Image
+                {
+                    Source = new BitmapImage(new Uri("pack://application:,,,/Resources/circle.png")),
+                    Width = Icon.DefaultRadius * 2,
+                    Height = Icon.DefaultRadius * 2
+                };
             }
             else
             {

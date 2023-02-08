@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 
 namespace SimonDock
 {
@@ -43,9 +44,9 @@ namespace SimonDock
             {
                 var x = currentX + icon.Radius;
                 currentX = x + icon.Radius;
-                var y = canvas.ActualHeight / 2 - icon.Radius;
+                var y = canvas.ActualHeight - icon.Radius;
                 icon.X = x;
-                icon.Y = y;
+                icon.Y = y - 20;
             }
 
             foreach (var icon in icons)

@@ -17,20 +17,44 @@ using System.Runtime.InteropServices;
 using System.IO;
 using System.ComponentModel;
 using System.Xml.Serialization;
+using System.Windows.Forms;
+using Microsoft.VisualBasic;
+using Hardcodet.Wpf.TaskbarNotification;
+using System.Windows.Controls.Ribbon;
 
 namespace SimonDock
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+
     public partial class MainWindow : Window
     {
+        private TaskbarIcon taskbarIcon;
+
+        private int MouseDownTimer;
 
         public MainWindow()
         {
             InitializeComponent();
+            Focus();
+            taskbarIcon = new TaskbarIcon();
+            taskbarIcon.Icon = new System.Drawing.Icon("../../../Resources/github.ico");
+            taskbarIcon.ToolTipText = "Simon Dock";
+
+            // taskbar menu
+            taskbarIcon.ContextMenu = new ContextMenu();
+
+            // add a close button 
+            var closeButton = new MenuItem();
+            closeButton.Header = "Close";
+            closeButton.Click += (s, e) => Close();
+            taskbarIcon.ContextMenu.Items.Add(closeButton);
+
+            taskbarIcon.TrayLeftMouseDown += TaskbarIcon_TrayLeftMouseDown;
 
             IsEnabled = true;
+            MouseDownTimer = 0;
 
             CompositionTarget.Rendering += OnRendering;
             // assign mouse down left click event to the main window to call the method MainWindow_MouseLeftButtonDown
@@ -41,6 +65,11 @@ namespace SimonDock
 
             // allow file drop
             AllowDrop = true;
+
+            // move window to bottom
+            WindowStartupLocation = WindowStartupLocation.Manual;
+            Left = SystemParameters.WorkArea.Width / 2 - Width / 2;
+            Top = SystemParameters.WorkArea.Height - Height;
 
             dock = new Dock();
             LoadState();
@@ -55,11 +84,17 @@ namespace SimonDock
             System.Diagnostics.Debug.WriteLine("init");
         }
 
-        private void MainWindow_Drop(object sender, DragEventArgs e)
+        private void TaskbarIcon_TrayLeftMouseDown(object sender, RoutedEventArgs e)
         {
-            if(e.Data.GetDataPresent(DataFormats.FileDrop))
+            this.Activate();
+            this.WindowState = WindowState.Normal;
+        }
+
+        private void MainWindow_Drop(object sender, System.Windows.DragEventArgs e)
+        {
+            if(e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
             {
-                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                string[] files = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
                 foreach (string file in files)
                 {
                     //retrive icon of file
@@ -80,12 +115,24 @@ namespace SimonDock
 
         private void OnRendering(object sender, EventArgs e)
         {
-
-            double width = WinCanvas.ActualWidth;
-            double height = WinCanvas.ActualHeight;
-            //double radius = Math.Min(width, height) / 2;
-            double x = width / 2;
-            double y = height / 2;
+            // check mouse pos
+            var mousePos = System.Windows.Forms.Control.MousePosition;
+            if (mousePos.Y > System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height - 20 &&
+                mousePos.X > System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width * 0.3 &&
+                mousePos.X < System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width * 0.6)
+            {
+                MouseDownTimer++;
+            }
+            else
+            {
+                MouseDownTimer = 0;
+            }
+            if (MouseDownTimer > 20)
+            {
+                MouseDownTimer = 0;
+                this.Activate();
+                this.WindowState = WindowState.Normal;
+            }
 
             WinCanvas.Children.Clear();
             dock.Draw(WinCanvas);
