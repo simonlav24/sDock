@@ -73,7 +73,7 @@ namespace SimonDock
                 var distance = Math.Sqrt(Math.Pow(mousePos.X - icon.X, 2) + Math.Pow(mousePos.Y - icon.Y, 2));
                 if (distance < icon.Radius)
                 {
-                    System.Diagnostics.Debug.WriteLine("clicked on " + icon.Name);
+                    Debug.WriteLine("clicked on " + icon.Data.Name);
                     return icon;
                 }
             }
@@ -89,9 +89,10 @@ namespace SimonDock
             var contextMenu = new ContextMenu();
             
             // rename option
-            var rename = new MenuItem();
-            rename.Header = "Edit";
-            contextMenu.Items.Add(rename);
+            var edit = new MenuItem();
+            edit.Header = "Edit";
+            edit.Click += (sender, args) => EditIcon(icon);
+            contextMenu.Items.Add(edit);
 
             // remove option
             var remove = new MenuItem();
@@ -99,7 +100,7 @@ namespace SimonDock
             remove.Click += (sender, args) => RemoveIcon(icon);
             contextMenu.Items.Add(remove);
 
-            if (File.Exists(icon.AbsolutePath))
+            if (File.Exists(icon.Data.Path))
             {
                 var openLocation = new MenuItem();
                 openLocation.Header = "Open file location";
@@ -117,42 +118,61 @@ namespace SimonDock
             throw new NotImplementedException();
         }
 
-        public void on_click(Canvas canvas)
+        public void on_leftDownClick(Canvas canvas)
         {
             var icon = findIcon(canvas);
             if (icon == null)
                 return;
-            if (icon.AbsolutePath != null)
+            icon.held = true;
+        }
+
+        public void on_leftUpClick(Canvas canvas)
+        {
+            var icon = findIcon(canvas);
+            if (icon == null)
+                return;
+            foreach (var i in icons)
             {
-                if (System.IO.File.Exists(icon.AbsolutePath))
+                i.held = false;
+            }
+            if (icon.Data.Path != null)
+            {
+                if (File.Exists(icon.Data.Path))
                 {
-                    System.Diagnostics.Process.Start(icon.AbsolutePath);
+                    Process.Start(icon.Data.Path);
                 }
-                else if (System.IO.Directory.Exists(icon.AbsolutePath))
+                else if (Directory.Exists(icon.Data.Path))
                 {
-                    Process.Start("explorer.exe", icon.AbsolutePath);
+                    Process.Start("explorer.exe", icon.Data.Path);
                 }
             }
         }
 
-        public List<string> GetPathList()
+        public List<IconData> GetIconDataList()
         {
-            var list = new List<string>();
+            var list = new List<IconData>();
             foreach (var icon in icons)
             {
-                list.Add(icon.AbsolutePath);
+                list.Add(icon.Data);
             }
             return list;
         }
 
-        private void RemoveIcon(Icon iconToRemove)
+        private void RemoveIcon(Icon icon)
         {
-            icons.Remove(iconToRemove);
+            icons.Remove(icon);
         }
+
+        private void EditIcon(Icon icon)
+        {
+            var editWindow = new EditWindow(icon);
+            editWindow.ShowDialog();
+        }
+    
 
         private void OpenFileLocation(Icon icon)
         {
-            Process.Start("explorer.exe", System.IO.Path.GetDirectoryName(icon.AbsolutePath));
+            Process.Start("explorer.exe", System.IO.Path.GetDirectoryName(icon.Data.Path));
         }
 
     }

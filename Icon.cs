@@ -12,12 +12,29 @@ using System.Runtime.InteropServices;
 using Microsoft.WindowsAPICodePack.Shell;
 using System.Drawing;
 using System.Windows.Automation.Peers;
+using System.Xml.Linq;
+using System.ComponentModel;
+using System.Windows.Shapes;
 
 namespace SimonDock
 {
-    public class Icon
+    [Serializable]
+    public class IconData
     {
+        public string Name { get; set; }
+        public string Path { get; set; }
+        public string ImagePath { get; set; }
+
+        public IconData()
+        {
+        }
+    }
+    public class Icon : INotifyPropertyChanged
+    {
+        public IconData Data;
+        
         public const double DefaultRadius = 40.0;
+        public const double HeldScale = 0.9;
         public const double DefaultLargeRadius = 70.0;
         public const double CloseDistance = 0.5;
         public const double EnteringDistance = 2.0;
@@ -26,29 +43,78 @@ namespace SimonDock
         public double Y { get; set; }
 
         public double Radius { get; set; }
-        
-        public String Name { get; set; }
-        
+
+        public string Name
+        {
+            get { return Data.Name; }
+            set
+            {
+                Data.Name = value;
+                OnPropertyChanged("Name");
+                NameBlock.Text = value;
+            }
+        }
+
+        public string ImagePath
+        {
+            get { return Data.ImagePath; }
+            set
+            {
+                Data.ImagePath = value;
+                OnPropertyChanged("ImagePath");
+                IconImage = new Image
+                {
+                    Source = new BitmapImage(new Uri(value)),
+                    Width = Icon.DefaultRadius * 2,
+                    Height = Icon.DefaultRadius * 2
+                };
+            }
+        }
+
+        public bool held;
+
         public TextBlock NameBlock { get; set; }
-        
-        public String AbsolutePath { get; set; }
 
         public Image IconImage { get; set; }
 
         public Icon(string path="icon.txt")
         {
+            Data = new IconData();
             Radius = DefaultRadius;
-            Name = System.IO.Path.GetFileNameWithoutExtension(path);
+            Data.Name = System.IO.Path.GetFileNameWithoutExtension(path);
 
-            AbsolutePath = ResolvePath(path);
+            Data.Path = ResolvePath(path);
             NameBlock = new TextBlock
             {
-                Text = Name,
+                Text = Data.Name,
                 FontSize = 16,
                 Foreground = System.Windows.Media.Brushes.White
             };
-            GetIconImage(AbsolutePath);
+            GetIconImage(Data.Path);
+
+            held = false;
         }
+        
+        public Icon(IconData data)
+        {
+            Data = data;
+            Radius = DefaultRadius;
+            NameBlock = new TextBlock
+            {
+                Text = Data.Name,
+                FontSize = 16,
+                Foreground = System.Windows.Media.Brushes.White
+            };
+
+            // handle icon image
+            if (Data.ImagePath is not null)
+                GetIconImage(Data.ImagePath);
+            else
+                GetIconImage(Data.Path);
+
+            held = false;
+        }
+    
 
         public Icon()
         {
@@ -75,6 +141,9 @@ namespace SimonDock
             var distance = Math.Sqrt(Math.Pow(mousePos.X - X, 2) + Math.Pow(mousePos.Y - Y, 2));
 
             Radius = zoomLogisticFunction(distance);
+
+            if (held)
+                Radius = Radius * HeldScale;
         }
 
         public void Draw(Canvas canvas)
@@ -131,18 +200,25 @@ namespace SimonDock
 
         private void GetIconImage(string path)
         {
-            
-
             if (File.Exists(path))
             {
-                ShellObject shellObject = ShellObject.FromParsingName(path);
-                var bmp = shellObject.Thumbnail.BitmapSource;
-                IconImage = new Image
+                // if icon is an image file
+                if (path.EndsWith(".png") || path.EndsWith(".jpg") || path.EndsWith(".jpeg") || path.EndsWith(".ico"))
                 {
-                    Source = bmp,
-                    Width = Icon.DefaultRadius * 2,
-                    Height = Icon.DefaultRadius * 2
-                };
+                    ImagePath = path;
+                }
+                // icon is a file
+                else
+                {
+                    ShellObject shellObject = ShellObject.FromParsingName(path);
+                    var bmp = shellObject.Thumbnail.BitmapSource;
+                    IconImage = new Image
+                    {
+                        Source = bmp,
+                        Width = Icon.DefaultRadius * 2,
+                        Height = Icon.DefaultRadius * 2
+                    };
+                }
             }
             else if (Directory.Exists(path))
             {
@@ -161,10 +237,13 @@ namespace SimonDock
             }
         }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
     }
-    
-
-
 }
 
 

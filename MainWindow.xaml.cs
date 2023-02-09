@@ -76,9 +76,7 @@ namespace SimonDock
             if (dock.isEmpty())
             {
                 // default icons
-                dock.AddIcon(new Icon("1.txt"));
-                dock.AddIcon(new Icon("2.txt"));
-                dock.AddIcon(new Icon("3.txt"));
+                dock.AddIcon(new Icon("empty.txt"));
             }
 
             System.Diagnostics.Debug.WriteLine("init");
@@ -96,11 +94,7 @@ namespace SimonDock
             {
                 string[] files = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
                 foreach (string file in files)
-                {
-                    //retrive icon of file
-                    
-
-
+                {                    
                     System.Diagnostics.Debug.WriteLine("adding file: " + file);
                     var icon = new Icon(file);
                     //icon.image = image;
@@ -144,13 +138,13 @@ namespace SimonDock
 
         private void Window_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            //System.Diagnostics.Debug.WriteLine("mouse down");
+            dock.on_leftDownClick(WinCanvas);
         }
 
         private void Window_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             System.Diagnostics.Debug.WriteLine("mouse up");
-            dock.on_click(WinCanvas);
+            dock.on_leftUpClick(WinCanvas);
         }
 
         private void Window_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
@@ -168,9 +162,9 @@ namespace SimonDock
         {
             using (var writer = new StreamWriter("state.xml"))
             {
-                List<string> paths = dock.GetPathList();
-                var serializer = new XmlSerializer(typeof(List<string>));
-                serializer.Serialize(writer, paths);
+                List<IconData> icons = dock.GetIconDataList();
+                var serializer = new XmlSerializer(typeof(List<IconData>));
+                serializer.Serialize(writer, icons);
             }
         }
 
@@ -181,17 +175,17 @@ namespace SimonDock
                 return;
             }
 
-            List<string> list;
+            List<IconData> list;
             
             using (var reader = new StreamReader("state.xml"))
             {
-                var serializer = new XmlSerializer(typeof(List<string>));
-                list = (List<string>)serializer.Deserialize(reader);
+                var serializer = new XmlSerializer(typeof(List<IconData>));
+                list = (List<IconData>)serializer.Deserialize(reader);
             }
 
-            foreach(var path in list)
+            foreach(var data in list)
             {
-                dock.AddIcon(new Icon(path));
+                dock.AddIcon(new Icon(data));
             }
        
         }

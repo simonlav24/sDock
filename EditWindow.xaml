@@ -1,0 +1,27 @@
+﻿<Window x:Class="SimonDock.EditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SimonDock"
+        mc:Ignorable="d"
+        Title="Edit" Height="500" Width="450">
+    <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Horizontal">
+            <Label Content="Title" Margin="5"/>
+            <TextBox Margin="5" Text="{Binding Name}" Width="200"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal">
+            <Label Content="Icon" Margin="5"/>
+            <Button x:Name="browseButton" Content="Browse" Click="BrowseButton_Click" />
+        </StackPanel>
+
+        <Image x:Name="previewImage" Width="128" Height="128" Source="{Binding ImagePath}"/>
+
+        
+
+
+
+    </StackPanel>
+</Window>
