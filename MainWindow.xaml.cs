@@ -20,9 +20,12 @@ using System.Xml.Serialization;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
 using Hardcodet.Wpf.TaskbarNotification;
-using System.Windows.Controls.Ribbon;
+using ContextMenu = System.Windows.Controls.ContextMenu;
+using MenuItem = System.Windows.Controls.MenuItem;
+using Application = System.Windows.Application;
+//using System.Windows.Controls.Ribbon;
 
-namespace SimonDock
+namespace sDock
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -39,7 +42,8 @@ namespace SimonDock
             InitializeComponent();
             Focus();
             taskbarIcon = new TaskbarIcon();
-            taskbarIcon.Icon = new System.Drawing.Icon("../../../Resources/github.ico");
+            Stream iconStream = Application.GetResourceStream(new Uri("pack://application:,,,/Resources/github.ico")).Stream;
+            taskbarIcon.Icon = new System.Drawing.Icon(iconStream);
             taskbarIcon.ToolTipText = "Simon Dock";
 
             // taskbar menu
@@ -90,11 +94,11 @@ namespace SimonDock
 
         private void MainWindow_Drop(object sender, System.Windows.DragEventArgs e)
         {
-            if(e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
+            if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
                 foreach (string file in files)
-                {                    
+                {
                     System.Diagnostics.Debug.WriteLine("adding file: " + file);
                     var icon = new Icon(file);
                     //icon.image = image;
@@ -176,18 +180,18 @@ namespace SimonDock
             }
 
             List<IconData> list;
-            
+
             using (var reader = new StreamReader("state.xml"))
             {
                 var serializer = new XmlSerializer(typeof(List<IconData>));
                 list = (List<IconData>)serializer.Deserialize(reader);
             }
 
-            foreach(var data in list)
+            foreach (var data in list)
             {
                 dock.AddIcon(new Icon(data));
             }
-       
+
         }
 
     }

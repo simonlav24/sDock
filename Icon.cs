@@ -16,7 +16,7 @@ using System.Xml.Linq;
 using System.ComponentModel;
 using System.Windows.Shapes;
 
-namespace SimonDock
+namespace sDock
 {
     [Serializable]
     public class IconData
@@ -71,7 +71,8 @@ namespace SimonDock
             }
         }
 
-        public bool held;
+        public bool Selected;
+        public bool Dragged;
 
         public TextBlock NameBlock { get; set; }
 
@@ -92,7 +93,8 @@ namespace SimonDock
             };
             GetIconImage(Data.Path);
 
-            held = false;
+            Selected = false;
+            Dragged = false;
         }
         
         public Icon(IconData data)
@@ -107,12 +109,13 @@ namespace SimonDock
             };
 
             // handle icon image
-            if (Data.ImagePath is not null)
+            if (Data.ImagePath != null)
                 GetIconImage(Data.ImagePath);
             else
                 GetIconImage(Data.Path);
 
-            held = false;
+            Selected = false;
+            Dragged = false;
         }
     
 
@@ -142,14 +145,19 @@ namespace SimonDock
 
             Radius = zoomLogisticFunction(distance);
 
-            if (held)
-                Radius = Radius * HeldScale;
+            if (distance < Radius)
+                Selected = true;
+            else
+                Selected = false;
+
+            if (Dragged)
+                X = mousePos.X;
         }
 
         public void Draw(Canvas canvas)
         {
             // draw the image
-            if (IconImage is not null)
+            if (IconImage != null)
             {
                 canvas.Children.Add(IconImage);
                 // scale the image to radius
@@ -159,14 +167,31 @@ namespace SimonDock
                 IconImage.RenderTransform = scaleTransform;
                 Canvas.SetLeft(IconImage, X - Radius);
                 Canvas.SetTop(IconImage, Y - Radius);
+
+                // reflect
+                var reflection = new Image
+                {
+                    Source = IconImage.Source,
+                    Width = IconImage.Width,
+                    Height = IconImage.Height
+                };
+                var scaleTransformReflect = new ScaleTransform(scale, scale * -1);
+                reflection.RenderTransform = scaleTransformReflect;
+                reflection.Opacity = 0.3;
+                canvas.Children.Add(reflection);
+                Canvas.SetLeft(reflection, X - Radius);
+                Canvas.SetTop(reflection, Y + 3 * Radius);
             }
 
             // draw Text
-            canvas.Children.Add(NameBlock);
-            NameBlock.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
-            System.Windows.Size textBlockSize = NameBlock.DesiredSize;
-            Canvas.SetLeft(NameBlock, X - textBlockSize.Width / 2);
-            Canvas.SetTop(NameBlock, canvas.ActualHeight - 25);
+            if (Selected)
+            {
+                canvas.Children.Add(NameBlock);
+                NameBlock.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
+                System.Windows.Size textBlockSize = NameBlock.DesiredSize;
+                Canvas.SetLeft(NameBlock, X - textBlockSize.Width / 2);
+                Canvas.SetTop(NameBlock, canvas.ActualHeight - 25);
+            }
         }
 
         // zoom functions
