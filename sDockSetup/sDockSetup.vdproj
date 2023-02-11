@@ -5789,7 +5789,7 @@
             }
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_9BFEB31A61C14C45889B879D048F0D98"
             {
-            "DefaultLocation" = "8:[ProgramFilesFolder][Manufacturer]\\[ProductName]"
+            "DefaultLocation" = "8:[ProgramFiles64Folder][Manufacturer]\\[ProductName]"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -5827,7 +5827,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:sDock"
         "ProductCode" = "8:{A2BB264F-FD5C-4A76-AF72-30EEDF5A0BBC}"
-        "PackageCode" = "8:{78D4D166-E741-46BE-9322-2246FFA448CF}"
+        "PackageCode" = "8:{8C00A38B-6286-4C47-87FF-72A72E479F83}"
         "UpgradeCode" = "8:{3625C708-9A78-42E4-8C89-74CDD5AC38B5}"
         "AspNetVersion" = "8:"
         "RestartWWWService" = "11:FALSE"
@@ -5848,7 +5848,7 @@
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
-        "TargetPlatform" = "3:0"
+        "TargetPlatform" = "3:1"
         "PreBuildEvent" = "8:"
         "PostBuildEvent" = "8:"
         "RunPostBuildEvent" = "3:0"

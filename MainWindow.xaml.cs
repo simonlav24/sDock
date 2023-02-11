@@ -147,6 +147,7 @@ namespace sDock
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             SaveState();
+            taskbarIcon.Icon.Dispose();
         }
 
         private void SaveState()

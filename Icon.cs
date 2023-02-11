@@ -42,8 +42,13 @@ namespace sDock
         public double X { get; set; }
         public double Y { get; set; }
 
+        public double Ax { get; set; }
+
+        public double Ay { get; set; }
+
         public double Radius { get; set; }
 
+        public double Aradius { get; set; }
         public string Name
         {
             get { return Data.Name; }
@@ -142,6 +147,7 @@ namespace sDock
             // get the mouse position in the main window
             var mousePos = Mouse.GetPosition(canvas);
             var distance = Math.Sqrt(Math.Pow(mousePos.X - X, 2) + Math.Pow(mousePos.Y - Y, 2));
+            distance = Math.Abs(mousePos.X - X);
 
             Radius = zoomLogisticFunction(distance);
 
@@ -152,6 +158,11 @@ namespace sDock
 
             if (Dragged)
                 X = mousePos.X;
+
+            Ax += (X - Ax) * 0.3;
+            Ay += (Y - Ay) * 0.3;
+            Aradius += (Radius - Aradius) * 0.3;
+
         }
 
         public void Draw(Canvas canvas)
@@ -161,12 +172,12 @@ namespace sDock
             {
                 canvas.Children.Add(IconImage);
                 // scale the image to radius
-                var scale = 2 * Radius / IconImage.ActualWidth;
+                var scale = 2 * Aradius / IconImage.ActualWidth;
                 scale *= 0.97;
                 ScaleTransform scaleTransform = new ScaleTransform(scale, scale);
                 IconImage.RenderTransform = scaleTransform;
-                Canvas.SetLeft(IconImage, X - Radius);
-                Canvas.SetTop(IconImage, Y - Radius);
+                Canvas.SetLeft(IconImage, Ax - Aradius);
+                Canvas.SetTop(IconImage, Ay - Aradius);
 
                 // reflect
                 var reflection = new Image
@@ -179,8 +190,8 @@ namespace sDock
                 reflection.RenderTransform = scaleTransformReflect;
                 reflection.Opacity = 0.3;
                 canvas.Children.Add(reflection);
-                Canvas.SetLeft(reflection, X - Radius);
-                Canvas.SetTop(reflection, Y + 3 * Radius);
+                Canvas.SetLeft(reflection, Ax - Aradius);
+                Canvas.SetTop(reflection, Ay + 3 * Aradius);
             }
 
             // draw Text
@@ -189,7 +200,7 @@ namespace sDock
                 canvas.Children.Add(NameBlock);
                 NameBlock.Measure(new System.Windows.Size(double.PositiveInfinity, double.PositiveInfinity));
                 System.Windows.Size textBlockSize = NameBlock.DesiredSize;
-                Canvas.SetLeft(NameBlock, X - textBlockSize.Width / 2);
+                Canvas.SetLeft(NameBlock, Ax - textBlockSize.Width / 2);
                 Canvas.SetTop(NameBlock, canvas.ActualHeight - 25);
             }
         }
@@ -197,8 +208,11 @@ namespace sDock
         // zoom functions
         private double zoomLogisticFunction(double distance)
         {
+            var s = 0.05;
+            // smaller s -> bigger spread
+
             var num = - (DefaultLargeRadius - DefaultRadius);
-            var exp = -0.1 * (distance - (DefaultRadius * CloseDistance + DefaultRadius * EnteringDistance) / 2.0);
+            var exp = - s * (distance - (DefaultRadius * CloseDistance + DefaultRadius * EnteringDistance) / 2.0);
             var denom = 1 + Math.Exp(exp);
 
             return num / denom + DefaultLargeRadius;

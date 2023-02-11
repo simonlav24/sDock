@@ -25,6 +25,7 @@ namespace sDock
         {
             State = DockState.Idle;
             DraggingTimer = 0;
+            Width = -1.0;
         }
         
         // collection of icons
@@ -34,6 +35,8 @@ namespace sDock
         private int DraggingTimer;
         
         private Icon CurrentIcon;
+
+        private double Width;
 
         // add icon method
         public void AddIcon(Icon icon)
@@ -101,6 +104,7 @@ namespace sDock
                     break;
             }
 
+
             var sumOfRadius = 0.0;
             foreach (var icon in icons)
             {
@@ -116,6 +120,7 @@ namespace sDock
                 icon.X = x;
                 icon.Y = y - 20;
             }
+            
 
             foreach (var icon in icons)
             {
