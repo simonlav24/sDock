@@ -1,24 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Drawing;
-using System.Runtime.InteropServices;
 using System.IO;
 using System.ComponentModel;
 using System.Xml.Serialization;
-using System.Windows.Forms;
-using Microsoft.VisualBasic;
 using Hardcodet.Wpf.TaskbarNotification;
 using ContextMenu = System.Windows.Controls.ContextMenu;
 using MenuItem = System.Windows.Controls.MenuItem;
@@ -164,7 +151,13 @@ namespace sDock
 
         private void SaveState()
         {
-            using (var writer = new StreamWriter("state.xml"))
+            var savePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\sDock";
+            if (!Directory.Exists(savePath))
+            {
+                Directory.CreateDirectory(savePath);
+            }
+            
+            using (var writer = new StreamWriter(savePath + "\\state.xml"))
             {
                 List<IconData> icons = dock.GetIconDataList();
                 var serializer = new XmlSerializer(typeof(List<IconData>));
@@ -174,14 +167,15 @@ namespace sDock
 
         private void LoadState()
         {
-            if (!File.Exists("state.xml"))
+            var savePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\sDock";
+            if (!Directory.Exists(savePath))
             {
                 return;
             }
 
             List<IconData> list;
 
-            using (var reader = new StreamReader("state.xml"))
+            using (var reader = new StreamReader(savePath + "\\state.xml"))
             {
                 var serializer = new XmlSerializer(typeof(List<IconData>));
                 list = (List<IconData>)serializer.Deserialize(reader);
