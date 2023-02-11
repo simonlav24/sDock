@@ -10,13 +10,29 @@ using Hardcodet.Wpf.TaskbarNotification;
 using ContextMenu = System.Windows.Controls.ContextMenu;
 using MenuItem = System.Windows.Controls.MenuItem;
 using Application = System.Windows.Application;
-//using System.Windows.Controls.Ribbon;
 
 namespace sDock
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+
+    public class Settings
+    {
+        public static double Width { get; set; }
+        public static double DefaultRadius { get; set; }
+        public static double DefaultLargeRadius { get; set; }
+        public static double CloseDistance { get; set; }
+        public static double EnteringDistance { get; set; }
+
+    public static void Init()
+        {
+            DefaultRadius = 40.0;
+            DefaultLargeRadius = 70.0;
+            CloseDistance = 0.5;
+            EnteringDistance = 2.0;
+        }
+    }
 
     public partial class MainWindow : Window
     {
@@ -27,7 +43,9 @@ namespace sDock
         public MainWindow()
         {
             InitializeComponent();
-            Focus();
+
+            Settings.Init();
+
             taskbarIcon = new TaskbarIcon();
             Stream iconStream = Application.GetResourceStream(new Uri("pack://application:,,,/Resources/github.ico")).Stream;
             taskbarIcon.Icon = new System.Drawing.Icon(iconStream);
@@ -67,7 +85,7 @@ namespace sDock
             if (dock.isEmpty())
             {
                 // default icons
-                dock.AddIcon(new Icon("empty.txt"));
+                InsertIcon(new Icon("empty.txt"));
             }
 
             System.Diagnostics.Debug.WriteLine("init");
@@ -79,17 +97,17 @@ namespace sDock
             this.WindowState = WindowState.Normal;
         }
 
-        private void MainWindow_Drop(object sender, System.Windows.DragEventArgs e)
+        private void MainWindow_Drop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                string[] files = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 foreach (string file in files)
                 {
                     System.Diagnostics.Debug.WriteLine("adding file: " + file);
                     var icon = new Icon(file);
                     //icon.image = image;
-                    dock.AddIcon(icon);
+                    InsertIcon(icon);
                 }
             }
         }
@@ -115,8 +133,8 @@ namespace sDock
             if (MouseDownTimer > 20)
             {
                 MouseDownTimer = 0;
-                this.Activate();
-                this.WindowState = WindowState.Normal;
+                Activate();
+                WindowState = WindowState.Normal;
             }
 
             // step
@@ -184,9 +202,16 @@ namespace sDock
 
             foreach (var data in list)
             {
-                dock.AddIcon(new Icon(data));
+                InsertIcon(new Icon(data));
             }
 
+        }
+
+        private void InsertIcon(Icon icon)
+        {
+            var newWidth = dock.AddIcon(icon);
+            Width = newWidth;
+            Left = SystemParameters.WorkArea.Width / 2 - Width / 2;
         }
 
     }

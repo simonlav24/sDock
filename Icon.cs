@@ -2,19 +2,13 @@
 using System.IO;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Image = System.Windows.Controls.Image;
 using IWshRuntimeLibrary;
 using File = System.IO.File;
-using System.Runtime.InteropServices;
 using Microsoft.WindowsAPICodePack.Shell;
-using System.Drawing;
-using System.Windows.Automation.Peers;
-using System.Xml.Linq;
 using System.ComponentModel;
-using System.Windows.Shapes;
 
 namespace sDock
 {
@@ -32,12 +26,6 @@ namespace sDock
     public class Icon : INotifyPropertyChanged
     {
         public IconData Data;
-        
-        public const double DefaultRadius = 40.0;
-        public const double HeldScale = 0.9;
-        public const double DefaultLargeRadius = 70.0;
-        public const double CloseDistance = 0.5;
-        public const double EnteringDistance = 2.0;
 
         public double X { get; set; }
         public double Y { get; set; }
@@ -70,8 +58,8 @@ namespace sDock
                 IconImage = new Image
                 {
                     Source = new BitmapImage(new Uri(value)),
-                    Width = Icon.DefaultRadius * 2,
-                    Height = Icon.DefaultRadius * 2
+                    Width = Settings.DefaultRadius * 2,
+                    Height = Settings.DefaultRadius * 2
                 };
             }
         }
@@ -86,7 +74,7 @@ namespace sDock
         public Icon(string path="icon.txt")
         {
             Data = new IconData();
-            Radius = DefaultRadius;
+            Radius = Settings.DefaultRadius;
             Data.Name = System.IO.Path.GetFileNameWithoutExtension(path);
 
             Data.Path = ResolvePath(path);
@@ -105,7 +93,7 @@ namespace sDock
         public Icon(IconData data)
         {
             Data = data;
-            Radius = DefaultRadius;
+            Radius = Settings.DefaultRadius;
             NameBlock = new TextBlock
             {
                 Text = Data.Name,
@@ -208,32 +196,32 @@ namespace sDock
         // zoom functions
         private double zoomLogisticFunction(double distance)
         {
-            var s = 0.05;
+            var s = 0.03;
             // smaller s -> bigger spread
 
-            var num = - (DefaultLargeRadius - DefaultRadius);
-            var exp = - s * (distance - (DefaultRadius * CloseDistance + DefaultRadius * EnteringDistance) / 2.0);
+            var num = - (Settings.DefaultLargeRadius - Settings.DefaultRadius);
+            var exp = - s * (distance - (Settings.DefaultRadius * Settings.CloseDistance + Settings.DefaultRadius * Settings.EnteringDistance) / 2.0);
             var denom = 1 + Math.Exp(exp);
 
-            return num / denom + DefaultLargeRadius;
+            return num / denom + Settings.DefaultLargeRadius;
         }
 
         private double zoomLinearFunction(double distance)
         {
-            if(distance < DefaultRadius * 2)
+            if(distance < Settings.DefaultRadius * 2)
             {
-                if (distance < DefaultRadius * 0.5)
+                if (distance < Settings.DefaultRadius * 0.5)
                 {
-                    return DefaultLargeRadius;
+                    return Settings.DefaultLargeRadius;
                 }
                 else
                 {
-                    return -((DefaultLargeRadius - DefaultRadius) /(DefaultRadius * 2 - DefaultRadius * 0.5)) * (distance - DefaultRadius * 2) + DefaultRadius;
+                    return -((Settings.DefaultLargeRadius - Settings.DefaultRadius) /(Settings.DefaultRadius * 2 - Settings.DefaultRadius * 0.5)) * (distance - Settings.DefaultRadius * 2) + Settings.DefaultRadius;
                 }
             }
             else
             {
-                return DefaultRadius;
+                return Settings.DefaultRadius;
             }
         }
 
@@ -254,8 +242,8 @@ namespace sDock
                     IconImage = new Image
                     {
                         Source = bmp,
-                        Width = Icon.DefaultRadius * 2,
-                        Height = Icon.DefaultRadius * 2
+                        Width = Settings.DefaultRadius * 2,
+                        Height = Settings.DefaultRadius * 2
                     };
                 }
             }
@@ -266,8 +254,8 @@ namespace sDock
                 IconImage = new Image
                 {
                     Source = new BitmapImage(new Uri("pack://application:,,,/Resources/folderIcon.png")),
-                    Width = Icon.DefaultRadius * 2,
-                    Height = Icon.DefaultRadius * 2
+                    Width = Settings.DefaultRadius * 2,
+                    Height = Settings.DefaultRadius * 2
                 };
             }
             else

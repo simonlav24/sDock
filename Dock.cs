@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 using System.IO;
 using System.Windows.Shapes;
 
@@ -25,7 +20,6 @@ namespace sDock
         {
             State = DockState.Idle;
             DraggingTimer = 0;
-            Width = -1.0;
         }
         
         // collection of icons
@@ -36,12 +30,11 @@ namespace sDock
         
         private Icon CurrentIcon;
 
-        private double Width;
-
         // add icon method
-        public void AddIcon(Icon icon)
+        public double AddIcon(Icon icon)
         {           
             icons.Add(icon);
+            return Math.Min(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width, icons.Count * 2 * Settings.DefaultRadius + 2 * Settings.DefaultLargeRadius);
         }
 
         public bool isEmpty()
@@ -120,7 +113,6 @@ namespace sDock
                 icon.X = x;
                 icon.Y = y - 20;
             }
-            
 
             foreach (var icon in icons)
             {
@@ -134,6 +126,18 @@ namespace sDock
             foreach (var icon in icons)
             {
                 icon.Draw(canvas);
+            }
+
+            if (false)
+            {
+                // draw rectangle
+                Rectangle rect = new Rectangle();
+                rect.Fill = System.Windows.Media.Brushes.Red;
+                rect.Width = 2.0 * icons.Count * Settings.DefaultLargeRadius;
+                rect.Height = 50;
+                canvas.Children.Add(rect);
+                Canvas.SetLeft(rect, canvas.ActualWidth / 2 - rect.Width / 2);
+                Canvas.SetTop(rect, 0);
             }
         }
         
