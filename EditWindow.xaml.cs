@@ -1,5 +1,7 @@
 ﻿using System.Windows;
+using System;
 using System.Windows.Forms;
+using System.IO;
 
 namespace sDock
 {
@@ -25,11 +27,26 @@ namespace sDock
             openFileDialog.Filter = "Image files (*.png;*.jpeg;*.jpg;*.gif)|*.png;*.jpeg;*.jpg;*.gif";
             if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
+                var imageChoicePath = openFileDialog.FileName;
                 Icon icon = (Icon)DataContext;
-                icon.ImagePath = openFileDialog.FileName;
-                System.Diagnostics.Debug.WriteLine("image picked" + icon.ImagePath);
+
+                // move the image to documents/icons
+                var savePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\sDock";
+                if (!Directory.Exists(savePath))
+                {
+                    Directory.CreateDirectory(savePath);
+                }
+                savePath = savePath + "\\icons";
+                if (!Directory.Exists(savePath))
+                {
+                    Directory.CreateDirectory(savePath);
+                }
+
+                var finalImagePath = savePath + "\\" + Path.GetFileName(imageChoicePath);
+                File.Copy(imageChoicePath, finalImagePath);
+                icon.ImagePath = finalImagePath;
+                System.Diagnostics.Debug.WriteLine("image picked" + finalImagePath);
             }
         }
-
     }
 }

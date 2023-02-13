@@ -27,10 +27,10 @@ namespace sDock
 
     public static void Init()
         {
-            DefaultRadius = 40.0;
-            DefaultLargeRadius = 70.0;
+            DefaultRadius = 30.0;
+            DefaultLargeRadius = 90.0;
             CloseDistance = 0.5;
-            EnteringDistance = 2.0;
+            EnteringDistance = 4.0;
         }
     }
 

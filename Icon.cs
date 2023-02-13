@@ -36,7 +36,11 @@ namespace sDock
 
         public double Radius { get; set; }
 
-        public double Aradius { get; set; }
+        private double AdditiveRadius { get; set; }
+        
+        private double RadiusVelocity { get; set; }
+
+    public double Aradius { get; set; }
         public string Name
         {
             get { return Data.Name; }
@@ -88,6 +92,7 @@ namespace sDock
 
             Selected = false;
             Dragged = false;
+            AdditiveRadius = 0;
         }
         
         public Icon(IconData data)
@@ -109,13 +114,9 @@ namespace sDock
 
             Selected = false;
             Dragged = false;
+            AdditiveRadius = 0;
         }
     
-
-        public Icon()
-        {
-        }
-
         private string ResolvePath(string path)
         {
             if (path.EndsWith(".lnk"))
@@ -134,8 +135,7 @@ namespace sDock
         {
             // get the mouse position in the main window
             var mousePos = Mouse.GetPosition(canvas);
-            var distance = Math.Sqrt(Math.Pow(mousePos.X - X, 2) + Math.Pow(mousePos.Y - Y, 2));
-            distance = Math.Abs(mousePos.X - X);
+            var distance = Math.Abs(mousePos.X - X);
 
             Radius = zoomLogisticFunction(distance);
 
@@ -151,6 +151,10 @@ namespace sDock
             Ay += (Y - Ay) * 0.3;
             Aradius += (Radius - Aradius) * 0.3;
 
+            RadiusVelocity += -(AdditiveRadius - 0.0) * 0.05;
+            RadiusVelocity *= 0.9;
+            AdditiveRadius += RadiusVelocity;
+
         }
 
         public void Draw(Canvas canvas)
@@ -160,12 +164,12 @@ namespace sDock
             {
                 canvas.Children.Add(IconImage);
                 // scale the image to radius
-                var scale = 2 * Aradius / IconImage.ActualWidth;
+                var scale = 2 * (Aradius + AdditiveRadius) / IconImage.ActualWidth;
                 scale *= 0.97;
                 ScaleTransform scaleTransform = new ScaleTransform(scale, scale);
                 IconImage.RenderTransform = scaleTransform;
-                Canvas.SetLeft(IconImage, Ax - Aradius);
-                Canvas.SetTop(IconImage, Ay - Aradius);
+                Canvas.SetLeft(IconImage, Ax - (Aradius + AdditiveRadius));
+                Canvas.SetTop(IconImage, Ay - (Aradius + AdditiveRadius));
 
                 // reflect
                 var reflection = new Image
@@ -268,6 +272,11 @@ namespace sDock
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void Bounce()
+        {
+            AdditiveRadius = -Settings.DefaultRadius;
         }
 
     }

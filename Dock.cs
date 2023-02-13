@@ -231,6 +231,7 @@ namespace sDock
                 {
                     Process.Start("explorer.exe", CurrentIcon.Data.Path);
                 }
+                CurrentIcon.Bounce();
             }
             CurrentIcon = null;
         }
