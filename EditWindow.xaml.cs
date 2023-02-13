@@ -41,9 +41,12 @@ namespace sDock
                 {
                     Directory.CreateDirectory(savePath);
                 }
-
+         
                 var finalImagePath = savePath + "\\" + Path.GetFileName(imageChoicePath);
-                File.Copy(imageChoicePath, finalImagePath);
+                if (!File.Exists(finalImagePath))
+                {
+                    File.Copy(imageChoicePath, finalImagePath);
+                }                
                 icon.ImagePath = finalImagePath;
                 System.Diagnostics.Debug.WriteLine("image picked" + finalImagePath);
             }

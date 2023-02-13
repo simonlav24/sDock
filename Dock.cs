@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.IO;
 using System.Windows.Shapes;
+using Path = System.IO.Path;
 
 namespace sDock
 {
@@ -218,8 +219,23 @@ namespace sDock
             
             if (CurrentIcon.Data.Path != null)
             {
-                if (File.Exists(CurrentIcon.Data.Path))
+                if (CurrentIcon.Data.Path.Contains(".py"))
                 {
+                    // python script
+                    ProcessStartInfo startInfo = new ProcessStartInfo()
+                    {
+                        FileName = "py",
+                        Arguments = CurrentIcon.Data.Path,
+                        RedirectStandardOutput = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        WorkingDirectory = Path.GetDirectoryName(CurrentIcon.Data.Path)
+                };
+                    Process.Start(startInfo);
+                }
+                else if (File.Exists(CurrentIcon.Data.Path))
+                {
+                    // open file
                     ProcessStartInfo startInfo = new ProcessStartInfo()
                     {
                         FileName = CurrentIcon.Data.Path,
@@ -229,7 +245,26 @@ namespace sDock
                 }
                 else if (Directory.Exists(CurrentIcon.Data.Path))
                 {
+                    // open folder
                     Process.Start("explorer.exe", CurrentIcon.Data.Path);
+                }
+                else
+                {
+                    // run script
+                    if(CurrentIcon.Data.Path.ToLower().Contains(".exe"))
+                    {
+                        if(CurrentIcon.Data.Path.Contains("\""))
+                        {
+                            var strings = CurrentIcon.Data.Path.Split('\"');
+                            Process.Start(strings[1], strings[2]);
+                        }
+                        else
+                        {
+                            var strings = CurrentIcon.Data.Path.Split(' ');
+                            string arguments = string.Join(" ", strings, 1, strings.Length - 1);
+                            Process.Start(strings[0], arguments);
+                        }
+                    }
                 }
                 CurrentIcon.Bounce();
             }

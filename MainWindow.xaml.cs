@@ -10,6 +10,7 @@ using Hardcodet.Wpf.TaskbarNotification;
 using ContextMenu = System.Windows.Controls.ContextMenu;
 using MenuItem = System.Windows.Controls.MenuItem;
 using Application = System.Windows.Application;
+using System.Windows.Threading;
 
 namespace sDock
 {
@@ -25,7 +26,7 @@ namespace sDock
         public static double CloseDistance { get; set; }
         public static double EnteringDistance { get; set; }
 
-    public static void Init()
+        public static void Init()
         {
             DefaultRadius = 30.0;
             DefaultLargeRadius = 90.0;
@@ -38,7 +39,7 @@ namespace sDock
     {
         private TaskbarIcon taskbarIcon;
 
-        private int MouseDownTimer;
+        private DispatcherTimer _timer;
 
         public MainWindow()
         {
@@ -63,9 +64,12 @@ namespace sDock
             taskbarIcon.TrayLeftMouseDown += TaskbarIcon_TrayLeftMouseDown;
 
             IsEnabled = true;
-            MouseDownTimer = 0;
 
             CompositionTarget.Rendering += OnRendering;
+            _timer = new DispatcherTimer();
+            _timer.Interval = TimeSpan.FromSeconds(0.5);
+            _timer.Tick += Timer_Tick;
+            _timer.Start();
             // assign mouse down left click event to the main window to call the method MainWindow_MouseLeftButtonDown
             Drop += MainWindow_Drop;
 
@@ -112,31 +116,24 @@ namespace sDock
             }
         }
 
-        // icon  member
+        // dock  member
         private Dock dock;
 
-
-        private void OnRendering(object sender, EventArgs e)
+        private void Timer_Tick(object sender, EventArgs e)
         {
-            // check mouse pos
             var mousePos = System.Windows.Forms.Control.MousePosition;
-            if (mousePos.Y > System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height - 20 &&
+            if (mousePos.Y > System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height - 10 &&
                 mousePos.X > System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width * 0.3 &&
                 mousePos.X < System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width * 0.6)
             {
-                MouseDownTimer++;
-            }
-            else
-            {
-                MouseDownTimer = 0;
-            }
-            if (MouseDownTimer > 20)
-            {
-                MouseDownTimer = 0;
                 Activate();
                 WindowState = WindowState.Normal;
+                Topmost = true;
+                Topmost = false;
             }
-
+        }
+        private void OnRendering(object sender, EventArgs e)
+        {
             // step
             dock.Step(WinCanvas);
 

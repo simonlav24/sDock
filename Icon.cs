@@ -68,6 +68,16 @@ namespace sDock
             }
         }
 
+        public string Path
+        {
+            get { return Data.Path; }
+            set
+            {
+                Data.Path = value;
+                OnPropertyChanged("Path");
+            }
+        }
+
         public bool Selected;
         public bool Dragged;
 
