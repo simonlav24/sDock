@@ -62,8 +62,8 @@ namespace sDock
                 IconImage = new Image
                 {
                     Source = new BitmapImage(new Uri(value)),
-                    Width = Settings.DefaultRadius * 2,
-                    Height = Settings.DefaultRadius * 2
+                    Width = Settings.settings.DefaultRadius * 2,
+                    Height = Settings.settings.DefaultRadius * 2
                 };
             }
         }
@@ -88,7 +88,7 @@ namespace sDock
         public Icon(string path="icon.txt")
         {
             Data = new IconData();
-            Radius = Settings.DefaultRadius;
+            Radius = Settings.settings.DefaultRadius;
             Data.Name = System.IO.Path.GetFileNameWithoutExtension(path);
 
             Data.Path = ResolvePath(path);
@@ -108,7 +108,7 @@ namespace sDock
         public Icon(IconData data)
         {
             Data = data;
-            Radius = Settings.DefaultRadius;
+            Radius = Settings.settings.DefaultRadius;
             NameBlock = new TextBlock
             {
                 Text = Data.Name,
@@ -213,29 +213,29 @@ namespace sDock
             var s = 0.03;
             // smaller s -> bigger spread
 
-            var num = - (Settings.DefaultLargeRadius - Settings.DefaultRadius);
-            var exp = - s * (distance - (Settings.DefaultRadius * Settings.CloseDistance + Settings.DefaultRadius * Settings.EnteringDistance) / 2.0);
+            var num = - (Settings.settings.DefaultLargeRadius - Settings.settings.DefaultRadius);
+            var exp = - s * (distance - (Settings.settings.DefaultRadius * Settings.settings.CloseDistance + Settings.settings.DefaultRadius * Settings.settings.EnteringDistance) / 2.0);
             var denom = 1 + Math.Exp(exp);
 
-            return num / denom + Settings.DefaultLargeRadius;
+            return num / denom + Settings.settings.DefaultLargeRadius;
         }
 
         private double zoomLinearFunction(double distance)
         {
-            if(distance < Settings.DefaultRadius * 2)
+            if(distance < Settings.settings.DefaultRadius * 2)
             {
-                if (distance < Settings.DefaultRadius * 0.5)
+                if (distance < Settings.settings.DefaultRadius * 0.5)
                 {
-                    return Settings.DefaultLargeRadius;
+                    return Settings.settings.DefaultLargeRadius;
                 }
                 else
                 {
-                    return -((Settings.DefaultLargeRadius - Settings.DefaultRadius) /(Settings.DefaultRadius * 2 - Settings.DefaultRadius * 0.5)) * (distance - Settings.DefaultRadius * 2) + Settings.DefaultRadius;
+                    return -((Settings.settings.DefaultLargeRadius - Settings.settings.DefaultRadius) /(Settings.settings.DefaultRadius * 2 - Settings.settings.DefaultRadius * 0.5)) * (distance - Settings.settings.DefaultRadius * 2) + Settings.settings.DefaultRadius;
                 }
             }
             else
             {
-                return Settings.DefaultRadius;
+                return Settings.settings.DefaultRadius;
             }
         }
 
@@ -256,8 +256,8 @@ namespace sDock
                     IconImage = new Image
                     {
                         Source = bmp,
-                        Width = Settings.DefaultRadius * 2,
-                        Height = Settings.DefaultRadius * 2
+                        Width = Settings.settings.DefaultRadius * 2,
+                        Height = Settings.settings.DefaultRadius * 2
                     };
                 }
             }
@@ -268,8 +268,8 @@ namespace sDock
                 IconImage = new Image
                 {
                     Source = new BitmapImage(new Uri("pack://application:,,,/Resources/folderIcon.png")),
-                    Width = Settings.DefaultRadius * 2,
-                    Height = Settings.DefaultRadius * 2
+                    Width = Settings.settings.DefaultRadius * 2,
+                    Height = Settings.settings.DefaultRadius * 2
                 };
             }
             else
@@ -286,7 +286,7 @@ namespace sDock
 
         public void Bounce()
         {
-            AdditiveRadius = -Settings.DefaultRadius;
+            AdditiveRadius = -Settings.settings.DefaultRadius;
         }
 
     }

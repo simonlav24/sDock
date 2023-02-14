@@ -35,7 +35,7 @@ namespace sDock
         public double AddIcon(Icon icon)
         {           
             icons.Add(icon);
-            return Math.Min(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width, icons.Count * 2 * Settings.DefaultRadius + 2 * Settings.DefaultLargeRadius);
+            return Math.Min(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width, icons.Count * 2 * Settings.settings.DefaultRadius + 2 * Settings.settings.DefaultLargeRadius);
         }
 
         public bool isEmpty()
@@ -134,7 +134,7 @@ namespace sDock
                 // draw rectangle
                 Rectangle rect = new Rectangle();
                 rect.Fill = System.Windows.Media.Brushes.Red;
-                rect.Width = 2.0 * icons.Count * Settings.DefaultLargeRadius;
+                rect.Width = 2.0 * icons.Count * Settings.settings.DefaultLargeRadius;
                 rect.Height = 50;
                 canvas.Children.Add(rect);
                 Canvas.SetLeft(rect, canvas.ActualWidth / 2 - rect.Width / 2);

@@ -1,0 +1,22 @@
+﻿<Window x:Class="sDock.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:sDock"
+        mc:Ignorable="d"
+        Title="SettingsWindow" Height="450" Width="450">
+    <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Horizontal">
+            <Label Content="Icon Radius" Margin="5" Width="100"/>
+            <TextBox Margin="5" Text="{Binding DefaultRadius}" Width="50"/>
+            <Slider Value="{Binding DefaultRadius}" VerticalAlignment="Center" Minimum="20" Maximum="90" Width="200"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal">
+            <Label Content="Zoom Radius" Margin="5" Width="100"/>
+            <TextBox Margin="5" Text="{Binding DefaultLargeRadius}" Width="50"/>
+            <Slider Value="{Binding DefaultLargeRadius}" VerticalAlignment="Center" Minimum="20" Maximum="90" Width="200"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

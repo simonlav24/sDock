@@ -18,21 +18,26 @@ namespace sDock
     /// Interaction logic for MainWindow.xaml
     /// </summary>
 
+    [Serializable]
+    public class AppState
+    {
+        public SettingsData settings { get; set; }
+
+        public List<IconData> icons { get; set; }
+    }
+
+    [Serializable]
+    public class SettingsData
+    {
+        public double DefaultRadius { get; set; } = 30.0;
+        public double DefaultLargeRadius { get; set; } = 70.0;
+        public double CloseDistance { get; set; } = 0.5;
+        public double EnteringDistance { get; set; } = 4.0;
+    }
+
     public class Settings
     {
-        public static double Width { get; set; }
-        public static double DefaultRadius { get; set; }
-        public static double DefaultLargeRadius { get; set; }
-        public static double CloseDistance { get; set; }
-        public static double EnteringDistance { get; set; }
-
-        public static void Init()
-        {
-            DefaultRadius = 30.0;
-            DefaultLargeRadius = 90.0;
-            CloseDistance = 0.5;
-            EnteringDistance = 4.0;
-        }
+        public static SettingsData settings { get; set; }
     }
 
     public partial class MainWindow : Window
@@ -45,21 +50,26 @@ namespace sDock
         {
             InitializeComponent();
 
-            Settings.Init();
-
             taskbarIcon = new TaskbarIcon();
             Stream iconStream = Application.GetResourceStream(new Uri("pack://application:,,,/Resources/github.ico")).Stream;
             taskbarIcon.Icon = new System.Drawing.Icon(iconStream);
             taskbarIcon.ToolTipText = "Simon Dock";
 
+            // init settings
+            Settings.settings = new SettingsData();
+
             // taskbar menu
             taskbarIcon.ContextMenu = new ContextMenu();
-
             // add a close button 
             var closeButton = new MenuItem();
             closeButton.Header = "Close";
             closeButton.Click += (s, e) => Close();
             taskbarIcon.ContextMenu.Items.Add(closeButton);
+            // add a settings button
+            var settingsButton = new MenuItem();
+            settingsButton.Header = "Settings";
+            settingsButton.Click += (s, e) => EditSettings(s, e);
+            taskbarIcon.ContextMenu.Items.Add(settingsButton);
 
             taskbarIcon.TrayLeftMouseDown += TaskbarIcon_TrayLeftMouseDown;
 
@@ -85,7 +95,9 @@ namespace sDock
             Top = SystemParameters.WorkArea.Height - Height;
 
             dock = new Dock();
+
             LoadState();
+
             if (dock.isEmpty())
             {
                 // default icons
@@ -95,10 +107,16 @@ namespace sDock
             System.Diagnostics.Debug.WriteLine("init");
         }
 
+        private void EditSettings(object sender, RoutedEventArgs e)
+        {
+            var settingsWindow = new SettingsWindow(Settings.settings);
+            settingsWindow.ShowDialog();
+        }
+
         private void TaskbarIcon_TrayLeftMouseDown(object sender, RoutedEventArgs e)
         {
-            this.Activate();
-            this.WindowState = WindowState.Normal;
+            Activate();
+            WindowState = WindowState.Normal;
         }
 
         private void MainWindow_Drop(object sender, DragEventArgs e)
@@ -175,9 +193,14 @@ namespace sDock
             
             using (var writer = new StreamWriter(savePath + "\\state.xml"))
             {
-                List<IconData> icons = dock.GetIconDataList();
-                var serializer = new XmlSerializer(typeof(List<IconData>));
-                serializer.Serialize(writer, icons);
+                AppState state = new AppState()
+                {
+                    settings = Settings.settings,
+                    icons = dock.GetIconDataList()
+                };
+                
+                var serializer = new XmlSerializer(typeof(AppState));
+                serializer.Serialize(writer, state);
             }
         }
 
@@ -188,18 +211,26 @@ namespace sDock
             {
                 return;
             }
-
-            List<IconData> list;
-
-            using (var reader = new StreamReader(savePath + "\\state.xml"))
+            savePath += "\\state.xml";
+            if (!File.Exists(savePath))
             {
-                var serializer = new XmlSerializer(typeof(List<IconData>));
-                list = (List<IconData>)serializer.Deserialize(reader);
+                return;
             }
 
-            foreach (var data in list)
+            AppState appState;
+            using (var reader = new StreamReader(savePath))
             {
-                InsertIcon(new Icon(data));
+                var serializer = new XmlSerializer(typeof(AppState));
+                appState = (AppState)serializer.Deserialize(reader);
+            }
+
+            // load settings
+            Settings.settings = appState.settings;
+
+            // load icons
+            foreach (var iconData in appState.icons)
+            {
+                InsertIcon(new Icon(iconData));
             }
 
         }

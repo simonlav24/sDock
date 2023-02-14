@@ -16,7 +16,7 @@
             <Label Content="Path" Margin="5" Width="100"/>
             <TextBox Margin="5" Text="{Binding Path}" Width="200"/>
         </StackPanel>
-        
+
         <StackPanel Orientation="Horizontal">
             <Label Content="Icon" Margin="5" Width="100"/>
             <Button x:Name="browseButton" Margin="5" Width="100" Content="Browse" Click="BrowseButton_Click" />
