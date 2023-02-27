@@ -81,6 +81,10 @@ namespace sDock
 
         private static MainWindow _instance;
 
+        private bool QuietMode;
+
+        private MenuItem QuietModeMenuItem;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -106,6 +110,12 @@ namespace sDock
             settingsButton.Header = "Settings";
             settingsButton.Click += (s, e) => EditSettings(s, e);
             taskbarIcon.ContextMenu.Items.Add(settingsButton);
+            // add a mode button
+            QuietModeMenuItem = new MenuItem();
+            QuietModeMenuItem.Header = "Quiet Mode";
+            QuietModeMenuItem.Click += (s, e) => QuietModeToggle(s, e);
+            taskbarIcon.ContextMenu.Items.Add(QuietModeMenuItem);
+
 
             taskbarIcon.TrayLeftMouseDown += TaskbarIcon_TrayLeftMouseDown;
 
@@ -130,6 +140,7 @@ namespace sDock
             Left = SystemParameters.WorkArea.Width / 2 - Width / 2;
             Top = SystemParameters.WorkArea.Height - Height;
 
+            QuietMode = false;
             dock = new Dock();
 
             LoadState();
@@ -152,6 +163,19 @@ namespace sDock
         {
             var settingsWindow = new SettingsWindow(Settings.settings);
             settingsWindow.ShowDialog();
+        }
+
+        private void QuietModeToggle(object sender, RoutedEventArgs e)
+        {
+            QuietMode = !QuietMode;
+            if(QuietMode)
+            {
+                QuietModeMenuItem.Header = "Disable Quiet Mode";
+            }
+            else
+            {
+                QuietModeMenuItem.Header = "Quiet Mode";
+            }
         }
 
         private void TaskbarIcon_TrayLeftMouseDown(object sender, RoutedEventArgs e)
@@ -180,6 +204,9 @@ namespace sDock
 
         private void Timer_Tick(object sender, EventArgs e)
         {
+            if (QuietMode)
+                return;
+
             var mousePos = System.Windows.Forms.Control.MousePosition;
             if (mousePos.Y > System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height - 10 &&
                 mousePos.X > System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width * 0.3 &&

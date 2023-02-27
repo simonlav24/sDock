@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:sDock"
         mc:Ignorable="d"
-        Title="Edit" Height="300" Width="450">
+        Height="330" Width="450">
     <StackPanel Orientation="Vertical">
         <StackPanel Orientation="Horizontal">
             <Label Content="Title" Margin="5" Width="100"/>
@@ -18,10 +18,19 @@
         </StackPanel>
 
         <StackPanel Orientation="Horizontal">
+            <Label Content="Args" Margin="5" Width="100"/>
+            <TextBox Margin="5" Text="{Binding Args, Mode=OneWay}" Width="200" IsEnabled="False" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal">
             <Label Content="Icon" Margin="5" Width="100"/>
             <Button x:Name="browseButton" Margin="5" Width="100" Content="Browse" Click="BrowseButton_Click" />
+            <Button x:Name="iconToDefault" Margin="5" Width="100" Content="Reset" Click="ResetButton_Click" />
         </StackPanel>
 
         <Image x:Name="previewImage" Width="128" Height="128" Source="{Binding IconImage.Source}"/>
+        
+        
+        
     </StackPanel>
 </Window>

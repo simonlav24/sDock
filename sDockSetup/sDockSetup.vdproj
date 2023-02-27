@@ -5826,15 +5826,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:sDock"
-        "ProductCode" = "8:{FDEA72C1-85CE-44CA-88E5-5551152838B1}"
-        "PackageCode" = "8:{632A9D60-4010-4D01-92AF-8D77353E6F4D}"
+        "ProductCode" = "8:{AF947744-F9D7-4CA7-BF6B-C4E68B96CCB3}"
+        "PackageCode" = "8:{F0F047FE-1DFD-454D-87E1-25285A4B83D4}"
         "UpgradeCode" = "8:{3625C708-9A78-42E4-8C89-74CDD5AC38B5}"
         "AspNetVersion" = "8:"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:FALSE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.5"
+        "ProductVersion" = "8:1.0.6"
         "Manufacturer" = "8:Simon"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -6376,7 +6376,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_5BBB5D088ED74381BA19B50DCEDBDDDB"
             {
-            "SourcePath" = "8:"
+            "SourcePath" = "8:..\\obj\\Debug\\sDock.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_9BFEB31A61C14C45889B879D048F0D98"

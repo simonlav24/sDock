@@ -17,6 +17,7 @@ namespace sDock
         public SettingsWindow(SettingsData settings)
         {
             InitializeComponent();
+            Icon = System.Windows.Media.Imaging.BitmapFrame.Create(new Uri("pack://application:,,,/Resources/github.ico"));
             DataContext = settings;
         }
     }

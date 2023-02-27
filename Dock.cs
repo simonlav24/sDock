@@ -9,7 +9,7 @@ using Path = System.IO.Path;
 
 namespace sDock
 {
-    enum DockState
+    public enum DockState
     {
         Idle,
         DraggingTimer,
@@ -239,9 +239,19 @@ namespace sDock
                     ProcessStartInfo startInfo = new ProcessStartInfo()
                     {
                         FileName = CurrentIcon.Data.Path,
+                        Arguments = CurrentIcon.Data.Args,
                         UseShellExecute = true
                     };
-                    Process.Start(startInfo);
+                    try
+                    {
+                        Process.Start(startInfo);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine(ex);
+                    }
+
+
                 }
                 else if (Directory.Exists(CurrentIcon.Data.Path))
                 {

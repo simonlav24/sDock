@@ -17,6 +17,7 @@ namespace sDock
     {
         public string Name { get; set; }
         public string Path { get; set; }
+        public string Args { get; set; }
         public string ImagePath { get; set; }
 
         public IconData()
@@ -51,6 +52,11 @@ namespace sDock
                 OnPropertyChanged("Name");
                 NameBlock.Text = value;
             }
+        }
+
+        public string Args
+        {
+            get { return Data.Args; }
         }
 
         public string ImagePath
@@ -143,6 +149,12 @@ namespace sDock
             {
                 var shell = new IWshShell_Class();
                 var shortcut = (IWshShortcut)shell.CreateShortcut(path);
+                var args = shortcut.Arguments;
+                var iconLocation = shortcut.IconLocation; // can retrieve icon from here, currently not in use
+                if (args != "")
+                {
+                    Data.Args = args;
+                }
                 return shortcut.TargetPath;
             }
             else
@@ -261,11 +273,26 @@ namespace sDock
                 // icon is a file
                 else
                 {
-                    ShellObject shellObject = ShellObject.FromParsingName(path);
-                    var bmp = shellObject.Thumbnail.BitmapSource;
+                    BitmapSource bitmapSource;
+                    if (path.EndsWith(".lnk"))
+                    {
+                        // currently unreachable
+                        var shell = new IWshShell_Class();
+                        var shortcut = (IWshShortcut)shell.CreateShortcut(path);
+                        var iconLocation = shortcut.IconLocation;
+
+                        BitmapImage bitmapImage = new BitmapImage(new Uri(iconLocation));
+                        bitmapSource = bitmapImage as BitmapSource;
+                    }
+                    else
+                    {
+                        ShellObject shellObject = ShellObject.FromParsingName(path);
+                        bitmapSource = shellObject.Thumbnail.BitmapSource;
+                    }
+                    
                     IconImage = new Image
                     {
-                        Source = bmp,
+                        Source = bitmapSource,
                         Width = Settings.settings.IconRadius * 2,
                         Height = Settings.settings.IconRadius * 2
                     };
@@ -297,6 +324,12 @@ namespace sDock
         public void Bounce()
         {
             AdditiveRadius = -Settings.settings.IconRadius;
+        }
+
+        public void ResetIconToDefault()
+        {
+            GetIconImage(Data.Path);
+            Data.ImagePath = null;
         }
 
     }

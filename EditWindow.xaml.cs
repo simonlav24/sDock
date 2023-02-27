@@ -20,14 +20,14 @@ namespace sDock
         {
             InitializeComponent();
             Icon = System.Windows.Media.Imaging.BitmapFrame.Create(new Uri("pack://application:,,,/Resources/github.ico"));
-
+            Title = "sDock - Edit " + data.Data.Name + " Icon";
             DataContext = data;
         }
 
         private void BrowseButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Image files (*.png;*.jpeg;*.jpg;*.gif)|*.png;*.jpeg;*.jpg;*.gif";
+            openFileDialog.Filter = "Image files (*.png;*.jpeg;*.jpg;*.gif;*.ico;)|*.png;*.jpeg;*.jpg;*.gif;*.ico";
             if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 var imageChoicePath = openFileDialog.FileName;
@@ -44,15 +44,20 @@ namespace sDock
                 {
                     Directory.CreateDirectory(savePath);
                 }
-         
+
                 var finalImagePath = savePath + "\\" + Path.GetFileName(imageChoicePath);
                 if (!File.Exists(finalImagePath))
                 {
                     File.Copy(imageChoicePath, finalImagePath);
-                }                
+                }
                 icon.ImagePath = finalImagePath;
                 System.Diagnostics.Debug.WriteLine("image picked" + finalImagePath);
             }
+        }
+
+        private void ResetButton_Click(object sender, RoutedEventArgs e)
+        {
+            ((Icon)DataContext).ResetIconToDefault();
         }
     }
 }
