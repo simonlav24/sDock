@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 
 namespace sDock
 {
@@ -10,6 +11,7 @@ namespace sDock
         public SettingsWindow()
         {
             InitializeComponent();
+            Icon = System.Windows.Media.Imaging.BitmapFrame.Create(new Uri("pack://application:,,,/Resources/github.ico"));
         }
 
         public SettingsWindow(SettingsData settings)

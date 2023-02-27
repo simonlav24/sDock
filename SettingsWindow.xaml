@@ -4,19 +4,22 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:sDock"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="SettingsWindow" Height="450" Width="450">
+        Title="sDock Settings" Height="450" Width="450">
     <StackPanel Orientation="Vertical">
+        <TextBlock Text="sDock"/>
+
         <StackPanel Orientation="Horizontal">
             <Label Content="Icon Radius" Margin="5" Width="100"/>
-            <TextBox Margin="5" Text="{Binding DefaultRadius}" Width="50"/>
-            <Slider Value="{Binding DefaultRadius}" VerticalAlignment="Center" Minimum="20" Maximum="90" Width="200"/>
+            <TextBox Margin="5" Text="{Binding IconRadius}" Width="50"/>
+            <Slider Value="{Binding IconRadius}" VerticalAlignment="Center" Minimum="20" Maximum="90" Width="200"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal">
             <Label Content="Zoom Radius" Margin="5" Width="100"/>
-            <TextBox Margin="5" Text="{Binding DefaultLargeRadius}" Width="50"/>
-            <Slider Value="{Binding DefaultLargeRadius}" VerticalAlignment="Center" Minimum="20" Maximum="90" Width="200"/>
+            <TextBox Margin="5" Text="{Binding IconLargeRadius}" Width="50"/>
+            <Slider Value="{Binding IconLargeRadius}" VerticalAlignment="Center" Minimum="20" Maximum="90" Width="200"/>
         </StackPanel>
     </StackPanel>
 </Window>

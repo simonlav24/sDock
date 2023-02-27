@@ -15,9 +15,8 @@ using System.Windows.Threading;
 namespace sDock
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// This class holds the model data of the app and serialized to saved file
     /// </summary>
-
     [Serializable]
     public class AppState
     {
@@ -26,30 +25,67 @@ namespace sDock
         public List<IconData> icons { get; set; }
     }
 
+    /// <summary>
+    /// Holds the global settings for the app
+    /// </summary>
     [Serializable]
     public class SettingsData
     {
-        public double DefaultRadius { get; set; } = 30.0;
-        public double DefaultLargeRadius { get; set; } = 70.0;
-        public double CloseDistance { get; set; } = 0.5;
-        public double EnteringDistance { get; set; } = 4.0;
+        private double _iconRadius;
+        public double IconRadius 
+        {
+            get { return _iconRadius; }
+            set { _iconRadius = value; }
+        }
+
+        private double _iconLargeRadius;
+        public double IconLargeRadius
+        {
+            get { return _iconLargeRadius; }
+            set
+            {
+                _iconLargeRadius = value;
+                MainWindow.GetInstance().UpdateWindowDimension(-1.0, _iconLargeRadius * 2.0 + 20.0);
+            }
+        }
+
+        public double CloseDistance { get; set; }
+        public double EnteringDistance { get; set; }
+
+        public SettingsData()
+        {
+            // default values
+            IconRadius = 30.0;
+            IconLargeRadius = 70.0;
+            CloseDistance = 0.5;
+            EnteringDistance = 4.0;
+        }
     }
 
+    /// <summary>
+    /// holder for class SettingsData as a means to reach them from all outer classes globally
+    /// </summary>
     public class Settings
     {
         public static SettingsData settings { get; set; }
     }
 
+    /// <summary>
+    /// Main window logic
+    /// </summary>
     public partial class MainWindow : Window
     {
         private TaskbarIcon taskbarIcon;
 
         private DispatcherTimer _timer;
 
+        private static MainWindow _instance;
+
         public MainWindow()
         {
             InitializeComponent();
-
+            _instance = this;
+            Icon = System.Windows.Media.Imaging.BitmapFrame.Create(new Uri("pack://application:,,,/Resources/github.ico"));
             taskbarIcon = new TaskbarIcon();
             Stream iconStream = Application.GetResourceStream(new Uri("pack://application:,,,/Resources/github.ico")).Stream;
             taskbarIcon.Icon = new System.Drawing.Icon(iconStream);
@@ -105,6 +141,11 @@ namespace sDock
             }
 
             System.Diagnostics.Debug.WriteLine("init");
+        }
+
+        public static MainWindow GetInstance()
+        {
+            return _instance;
         }
 
         private void EditSettings(object sender, RoutedEventArgs e)
@@ -238,9 +279,22 @@ namespace sDock
         private void InsertIcon(Icon icon)
         {
             var newWidth = dock.AddIcon(icon);
-            Width = newWidth;
-            Left = SystemParameters.WorkArea.Width / 2 - Width / 2;
+            UpdateWindowDimension(newWidth, -1.0);
         }
 
+        public void UpdateWindowDimension(double newWidth, double newHeight)
+        {
+            if(newWidth > 0.0)
+            {
+                Width = newWidth;
+                Left = SystemParameters.WorkArea.Width / 2 - newWidth / 2;
+            }
+                
+            if(newHeight > 0.0)
+            {
+                Height = newHeight;
+                Top = SystemParameters.WorkArea.Height - Height;
+            }
+        }
     }
 }

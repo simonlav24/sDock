@@ -13,11 +13,14 @@ namespace sDock
         public EditWindow()
         {
             InitializeComponent();
+            Icon = System.Windows.Media.Imaging.BitmapFrame.Create(new Uri("pack://application:,,,/Resources/github.ico"));
         }
 
         public EditWindow(Icon data)
         {
             InitializeComponent();
+            Icon = System.Windows.Media.Imaging.BitmapFrame.Create(new Uri("pack://application:,,,/Resources/github.ico"));
+
             DataContext = data;
         }
 

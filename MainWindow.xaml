@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:sDock"
         mc:Ignorable="d"
-        Title="MainWindow" Height="180" Width="800"
+        Title="sDock" Height="180" Width="800"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"

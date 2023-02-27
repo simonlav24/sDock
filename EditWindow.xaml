@@ -22,6 +22,6 @@
             <Button x:Name="browseButton" Margin="5" Width="100" Content="Browse" Click="BrowseButton_Click" />
         </StackPanel>
 
-        <Image x:Name="previewImage" Width="128" Height="128" Source="{Binding ImagePath}"/>
+        <Image x:Name="previewImage" Width="128" Height="128" Source="{Binding IconImage.Source}"/>
     </StackPanel>
 </Window>
