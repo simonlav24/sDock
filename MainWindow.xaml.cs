@@ -35,7 +35,11 @@ namespace sDock
         public double IconRadius 
         {
             get { return _iconRadius; }
-            set { _iconRadius = value; }
+            set
+            {
+                _iconRadius = value;
+                MainWindow.GetInstance().UpdateWindowDimension();
+            }
         }
 
         private double _iconLargeRadius;
@@ -45,14 +49,14 @@ namespace sDock
             set
             {
                 _iconLargeRadius = value;
-                MainWindow.GetInstance().UpdateWindowDimension(-1.0, _iconLargeRadius * 2.0 + 20.0);
+                MainWindow.GetInstance().UpdateWindowDimension();
             }
         }
 
         public double CloseDistance { get; set; }
         public double EnteringDistance { get; set; }
 
-        private string _version = "1.0.6";
+        private string _version = "1.0.7";
         public string Version
         {
             get { return _version; }
@@ -311,23 +315,24 @@ namespace sDock
 
         private void InsertIcon(Icon icon)
         {
-            var newWidth = dock.AddIcon(icon);
-            UpdateWindowDimension(newWidth, -1.0);
+            dock.AddIcon(icon);
+            UpdateWindowDimension();
         }
 
-        public void UpdateWindowDimension(double newWidth, double newHeight)
+        public void UpdateWindowDimension()
         {
-            if(newWidth > 0.0)
-            {
-                Width = newWidth;
-                Left = SystemParameters.WorkArea.Width / 2 - newWidth / 2;
-            }
-                
-            if(newHeight > 0.0)
-            {
-                Height = newHeight;
-                Top = SystemParameters.WorkArea.Height - Height;
-            }
+            if (dock == null)
+                return;
+
+            var width = Math.Min(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width, dock.icons.Count * 2 * Settings.settings.IconRadius + 2 * Settings.settings.IconLargeRadius);
+            var height = Settings.settings.IconLargeRadius * 2.0 + 20.0;
+
+            Width = width;
+            Height = height;
+
+            Left = SystemParameters.WorkArea.Width / 2 - Width / 2;
+            Top = SystemParameters.WorkArea.Height - Height;
         }
+
     }
 }

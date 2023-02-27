@@ -15,7 +15,7 @@
             <LineBreak/>
             A fun icon dock for Windows
             <LineBreak/>
-            Created by Simon Lab. <Hyperlink NavigateUri="https://github.com/simonlav24">Github</Hyperlink>
+            Created by Simon Lab. <Hyperlink NavigateUri="https://github.com/simonlav24" RequestNavigate="Hyperlink_RequestNavigate">Github</Hyperlink>
         </TextBlock>
 
 
