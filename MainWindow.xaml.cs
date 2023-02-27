@@ -52,6 +52,12 @@ namespace sDock
         public double CloseDistance { get; set; }
         public double EnteringDistance { get; set; }
 
+        private string _version = "1.0.6";
+        public string Version
+        {
+            get { return _version; }
+        }
+
         public SettingsData()
         {
             // default values
@@ -100,11 +106,6 @@ namespace sDock
 
             // taskbar menu
             taskbarIcon.ContextMenu = new ContextMenu();
-            // add a close button 
-            var closeButton = new MenuItem();
-            closeButton.Header = "Close";
-            closeButton.Click += (s, e) => Close();
-            taskbarIcon.ContextMenu.Items.Add(closeButton);
             // add a settings button
             var settingsButton = new MenuItem();
             settingsButton.Header = "Settings";
@@ -115,6 +116,11 @@ namespace sDock
             QuietModeMenuItem.Header = "Quiet Mode";
             QuietModeMenuItem.Click += (s, e) => QuietModeToggle(s, e);
             taskbarIcon.ContextMenu.Items.Add(QuietModeMenuItem);
+            // add a close button 
+            var closeButton = new MenuItem();
+            closeButton.Header = "Close";
+            closeButton.Click += (s, e) => Close();
+            taskbarIcon.ContextMenu.Items.Add(closeButton);
 
 
             taskbarIcon.TrayLeftMouseDown += TaskbarIcon_TrayLeftMouseDown;

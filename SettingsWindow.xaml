@@ -6,9 +6,18 @@
         xmlns:local="clr-namespace:sDock"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="sDock Settings" Height="150" Width="450">
+        Title="sDock Settings" Height="180" Width="450">
     <StackPanel Orientation="Vertical">
-        <TextBlock Text="sDock"/>
+
+
+        <TextBlock Margin="5" TextAlignment="Center" HorizontalAlignment="Center">
+            sDock version <Run Text="{Binding Version, Mode=OneWay}"/>
+            <LineBreak/>
+            A fun icon dock for Windows
+            <LineBreak/>
+            Created by Simon Lab. <Hyperlink NavigateUri="https://github.com/simonlav24">Github</Hyperlink>
+        </TextBlock>
+
 
         <StackPanel Orientation="Horizontal">
             <Label Content="Icon Radius" Margin="5" Width="100"/>
