@@ -107,14 +107,15 @@ namespace sDock
             Radius = Settings.settings.IconRadius;
             Data.Name = System.IO.Path.GetFileNameWithoutExtension(path);
 
-            Data.Path = ResolvePath(path);
+            ResolvePath(path);
+            ResolveImage(path);
+
             NameBlock = new TextBlock
             {
                 Text = Data.Name,
                 FontSize = 16,
                 Foreground = System.Windows.Media.Brushes.White
             };
-            GetIconImage(Data.Path);
 
             Selected = false;
             Dragged = false;
@@ -134,16 +135,16 @@ namespace sDock
 
             // handle icon image
             if (Data.ImagePath != null)
-                GetIconImage(Data.ImagePath);
+                ResolveImage(Data.ImagePath);
             else
-                GetIconImage(Data.Path);
+                ResolveImage(Data.Path);
 
             Selected = false;
             Dragged = false;
             AdditiveRadius = 0;
         }
     
-        private string ResolvePath(string path)
+        private void ResolvePath(string path)
         {
             if (path.EndsWith(".lnk"))
             {
@@ -155,11 +156,11 @@ namespace sDock
                 {
                     Data.Args = args;
                 }
-                return shortcut.TargetPath;
+                Data.Path = shortcut.TargetPath;
             }
             else
             {
-                return path;
+                Data.Path = path;
             }
         }
     
@@ -261,7 +262,7 @@ namespace sDock
             }
         }
 
-        private void GetIconImage(string path)
+        private void ResolveImage(string path)
         {
             if (File.Exists(path))
             {
@@ -276,16 +277,43 @@ namespace sDock
                     BitmapSource bitmapSource;
                     if (path.EndsWith(".lnk"))
                     {
-                        // currently unreachable
                         var shell = new IWshShell_Class();
                         var shortcut = (IWshShortcut)shell.CreateShortcut(path);
                         var iconLocation = shortcut.IconLocation;
 
-                        BitmapImage bitmapImage = new BitmapImage(new Uri(iconLocation));
-                        bitmapSource = bitmapImage as BitmapSource;
+                        var splitted = iconLocation.Split(',');
+                        var iconPath = splitted[0];
+                        var iconIndex = "0";
+                        if (splitted.Length > 1)
+                            iconIndex = splitted[1];
+
+                        if(iconPath.EndsWith("ico"))
+                        {
+                            ImagePath = iconPath;
+                            BitmapImage bitmapImage = new BitmapImage(new Uri(iconPath));
+                            bitmapSource = bitmapImage as BitmapSource;
+                        }
+                        else
+                        {
+                            string iconToReach;
+                            if(iconPath == "")
+                            {
+                                // icon not found
+                                iconToReach = path;
+                            }
+                            else
+                            {
+                                // icon is from exe file
+                                iconToReach = iconPath;
+                            }
+                            ShellObject shellObject = ShellObject.FromParsingName(iconToReach);
+                            bitmapSource = shellObject.Thumbnail.BitmapSource;
+                            
+                        }
                     }
                     else
                     {
+                        // exe file
                         ShellObject shellObject = ShellObject.FromParsingName(path);
                         bitmapSource = shellObject.Thumbnail.BitmapSource;
                     }
@@ -312,6 +340,13 @@ namespace sDock
             else
             {
                 // invalid path
+                IconImage = new Image();
+                IconImage = new Image
+                {
+                    Source = new BitmapImage(new Uri("pack://application:,,,/Resources/fileIcon.png")),
+                    Width = Settings.settings.IconRadius * 2,
+                    Height = Settings.settings.IconRadius * 2
+                };
             }
         }
 
@@ -328,7 +363,7 @@ namespace sDock
 
         public void ResetIconToDefault()
         {
-            GetIconImage(Data.Path);
+            ResolveImage(Data.Path);
             Data.ImagePath = null;
         }
 

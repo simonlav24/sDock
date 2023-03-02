@@ -32,10 +32,13 @@ namespace sDock
         private Icon CurrentIcon;
 
         // add icon method
-        public double AddIcon(Icon icon)
+        public void AddIcon(Icon icon)
         {           
             icons.Add(icon);
-            return Math.Min(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width, icons.Count * 2 * Settings.settings.IconRadius + 2 * Settings.settings.IconLargeRadius);
+            if(icons.Count == 2 && icons[0].Data.Name == "empty")
+            {
+                icons.RemoveAt(0);
+            }
         }
 
         public bool isEmpty()

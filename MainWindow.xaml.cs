@@ -203,7 +203,6 @@ namespace sDock
                 {
                     System.Diagnostics.Debug.WriteLine("adding file: " + file);
                     var icon = new Icon(file);
-                    //icon.image = image;
                     InsertIcon(icon);
                 }
             }
