@@ -233,8 +233,13 @@ namespace sDock
                         UseShellExecute = false,
                         CreateNoWindow = true,
                         WorkingDirectory = Path.GetDirectoryName(CurrentIcon.Data.Path)
-                };
+                    };
                     Process.Start(startInfo);
+                }
+                else if(CurrentIcon.Data.Path.ToLower().Contains("url:"))
+                {
+                    var url = CurrentIcon.Data.Path.ToLower().Replace("url:", "");
+                    System.Diagnostics.Process.Start(url);
                 }
                 else if (File.Exists(CurrentIcon.Data.Path))
                 {
