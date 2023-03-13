@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:sDock"
         mc:Ignorable="d"
-        Height="330" Width="450">
+        Height="330" Width="450"
+        Closing="Window_Closing">
     <StackPanel Orientation="Vertical">
         <StackPanel Orientation="Horizontal">
             <Label Content="Title" Margin="5" Width="100"/>

@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:sDock"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="sDock Settings" Height="180" Width="450">
+        Title="sDock Settings" Height="180" Width="450"
+        Closing="Window_Closing">
     <StackPanel Orientation="Vertical">
 
 

@@ -59,5 +59,10 @@ namespace sDock
         {
             ((Icon)DataContext).ResetIconToDefault();
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            MainWindow.GetInstance().SaveState();
+        }
     }
 }

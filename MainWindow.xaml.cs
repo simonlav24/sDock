@@ -260,7 +260,7 @@ namespace sDock
             taskbarIcon.Icon.Dispose();
         }
 
-        private void SaveState()
+        public void SaveState()
         {
             var savePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\sDock";
             if (!Directory.Exists(savePath))
